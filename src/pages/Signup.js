@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
+import { handleError } from "../utils";
 
 function Signup() {
 
@@ -22,11 +22,34 @@ function Signup() {
 
     }
 
-    const handleSignup = (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-        console.log(signupInfo);
+        const { name, email, password } = signupInfo;
+        if (!name || !email || !password) {
+            return handleError("All Fields are Required ")
+        }
+        try {
+
+            const url = "http://localhost:8080/auth/signup";
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(signupInfo)
+
+            });
+            console.log("Status:", response.status);
+
+            const result = await response.json();
+            console.log("Result:", result);
+        } catch (err) {
+            handleError(err);
+
+        }
     }
-    console.log("signupInfo -> ", signupInfo)
+
+
     return (
         <div className="bg-red-300  h-screen  justify-center  ">
             <div className="b-10  flex justify-center pt-10 ">
@@ -40,10 +63,10 @@ function Signup() {
                             <input className=" w-[270px] border border-gray-600 rounded-sm  p-2  "
                                 onChange={handleChange}
                                 type="text"
-                                name="Name"
+                                name="name"
                                 autoFocus
                                 placeholder="Enter your name..."
-                                value= {signupInfo.name}
+                                value={signupInfo.name}
 
                             />
                         </div>
